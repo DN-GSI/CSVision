@@ -1,0 +1,48 @@
+NAMING OF CS OBJECTS IN THE DETECTOR.INI MODE
+
+The names for the CS instances is not completely free if you use the detectors.ini file.
+Then you should use names like "Camera_TR5DF1". Here, Camera is necessary, TR5DF1 has to
+be consistent with the names in the detectors.ini file (compare to [name][HITRAP TR5DF1]).
+
+----------------------------------------------------------------------------------------
+TIME-OUTS DURING STARTUP
+
+If there are a lot of timeouts during the creation of the objects one can try to make
+a small change in the registry. The reason for these time outs is most probably that
+the "Enumerate Cameras.vi" in the constructor sends a multicast DNS around the network
+to which also for instance all network printers answer (and this can take up to 1 min).
+To overcome this problem one can switch of this DNS multicast resulting that IP cameras
+should not work anymore (which means also MAX can not see them anymore). For whatever 
+reason the GIGE cameras are still working (?). 
+To change the settings open regedit, go to 
+
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\?services\niimaqdxk\Parameters
+ 
+and set "EnableIPCameras" as a DWORD to 0.
+
+Now you may still get timeouts, but in fact the object should be created (one can check
+this by looking at the DIMservice NumberOfImages of the camera. If it is larger than 0
+everything is ok.
+
+Maybe it is enough to run for each PC one time the EnumerateCameras.vi and then to switch
+of the IP camera broadcast, because the PC has already saved the important data.
+
+----------------------------------------------------------------------------------------
+DURING STARTUP YOU GET AN ERROR FROM THE VI ACQUIRE CONFIGURATION.VI
+
+The reason is most probable that an old firmware / configuration file is used for the 
+camera. The error also appears in MAX if you try to capture an image with the camera and
+and it is gone when you restart CS / MAX and comes back when you restart the PC. If you
+look closer to the error messages in the source code you will recognize that the acquire
+configuration.vi shows that the parameters are out of range which in fact makes no sense.
+To solve it, see:
+
+http://digital.ni.com/public.nsf/allkb/FCE7506A3AF7636C862576240072716D
+
+----------------------------------------------------------------------------------------
+TIMEOUT DURING IMAGE CAPTURE
+
+Most probable the problem here is a wrong timeout value. So the timeout value of the camera
+should be always larger than the complete acquisition time of the camera. Otherwise you will
+never get a picture.
+
